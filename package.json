@@ -1,5 +1,5 @@
 {
-  "name": "pup",
+  "name": "cmdline-server",
   "private": true,
   "scripts": {
     "start": "meteor --settings settings-development.json",
@@ -26,6 +26,7 @@
     "moment": "^2.22.1",
     "moment-timezone": "^0.5.16",
     "polished": "^1.9.2",
+    "prettier": "^1.14.2",
     "prop-types": "^15.6.1",
     "react": "^16.3.2",
     "react-addons-pure-render-mixin": "^15.6.2",
@@ -128,5 +129,9 @@
     "type": "git"
   },
   "author": "cleverbeagle <ryan.glover@cleverbeagle.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "prettier": {
+    "trailingComma": "es5",
+    "singleQuote": true
+  }
 }
