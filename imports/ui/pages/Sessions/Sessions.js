@@ -29,6 +29,21 @@ const handleRemove = (documentId) => {
   }
 };
 
+const getUsername = (id) => {
+  const user = Meteor.users.findOne(id);
+
+  if (user.profile && user.profile.name) {
+    const { first, last } = user.profile.name;
+    return `${first} ${last}`;
+  }
+
+  if (user.emails && user.emails.length > 0) {
+    return user.emails[0].address;
+  }
+
+  return id;
+};
+
 const Sessions = ({
  loading, sessions, match, history 
 }) =>
@@ -41,7 +56,8 @@ const Sessions = ({
         <Table responsive>
           <thead>
             <tr>
-              <th>Title</th>
+              <th>Owner</th>
+              <th>Hostname</th>
               <th>Last Updated</th>
               <th>Created</th>
               <th />
@@ -49,9 +65,10 @@ const Sessions = ({
             </tr>
           </thead>
           <tbody>
-            {sessions.map(({ _id, title, createdAt, updatedAt }) => (
+            {sessions.map(({ _id, owner, hostname, createdAt, updatedAt }) => (
               <tr key={_id}>
-                <td>{title}</td>
+                <td>{getUsername(owner)}</td>
+                <td>{hostname}</td>
                 <td>{timeago(updatedAt)}</td>
                 <td>{monthDayYearAtTime(createdAt)}</td>
                 <td>
@@ -96,9 +113,11 @@ Sessions.propTypes = {
 };
 
 export default withTracker(() => {
-  const subscription = Meteor.subscribe('sessions');
+  const sessionSubscription = Meteor.subscribe('sessions');
+  const usersSubscription = Meteor.subscribe('users.allUsers');
+
   return {
-    loading: !subscription.ready(),
+    loading: !sessionSubscription.ready() || !usersSubscription.ready(),
     sessions: SessionsCollection.find().fetch(),
   };
 })(Sessions);

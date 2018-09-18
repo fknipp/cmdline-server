@@ -9,3 +9,14 @@ Meteor.publish('users.editProfile', function usersProfile() {
     },
   });
 });
+
+Meteor.publish('users.allUsers', () =>
+  Meteor.users.find(
+    {},
+    {
+      fields: {
+        emails: 1,
+        profile: 1,
+      },
+    },
+  ));
