@@ -45,6 +45,10 @@ const cmdLineSchema = new SimpleSchema({
     type: String,
     label: 'The user executing the command.',
   },
+  directory: {
+    type: String,
+    label: 'The directory, where the command was executed.',
+  },
   files: {
     type: Array,
     label: 'The respective files of this command',

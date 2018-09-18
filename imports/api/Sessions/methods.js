@@ -28,6 +28,33 @@ Meteor.methods({
       handleMethodException(exception);
     }
   },
+  'sessions.addCommand': function sessionsAddCommand(doc) {
+    check(doc, {
+      sessionId: String,
+      user: String,
+      directory: String,
+      command: String,
+    });
+
+    try {
+      const { sessionId, ...command } = doc;
+
+      const session = Sessions.findOne(sessionId);
+
+      if (session.owner !== this.userId) {
+        throw new Meteor.Error(
+          '403',
+          "Sorry. You're not allowed to update this session.",
+        );
+      }
+
+      return Sessions.update(sessionId, {
+        $push: { commands: { date: new Date().toISOString(), ...command } },
+      });
+    } catch (exception) {
+      handleMethodException(exception);
+    }
+  },
   'sessions.remove': function sessionsRemove(sessionId) {
     check(sessionId, String);
 
@@ -38,7 +65,10 @@ Meteor.methods({
         return Sessions.remove(sessionId);
       }
 
-      throw new Meteor.Error('403', 'Sorry. You\'re not allowed to delete this session.');
+      throw new Meteor.Error(
+        '403',
+        "Sorry. You're not allowed to delete this session.",
+      );
     } catch (exception) {
       handleMethodException(exception);
     }
@@ -46,10 +76,7 @@ Meteor.methods({
 });
 
 rateLimit({
-  methods: [
-    'sessions.insert',
-    'sessions.remove',
-  ],
+  methods: ['sessions.insert', 'sessions.remove'],
   limit: 5,
   timeRange: 1000,
 });
