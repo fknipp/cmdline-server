@@ -11,6 +11,11 @@ export const monthDayYearAtTime = (timestamp, timezone) => (
     moment(timestamp).tz(timezone).format('MMMM Do, YYYY [at] hh:mm a')
 );
 
+export const time = (timestamp, timezone) => (
+  !timezone ? moment(timestamp).format('HH:mm:ss') :
+    moment(timestamp).tz(timezone).format('HH:mm:ss')
+);
+
 export const timeago = (timestamp, timezone) => (
   !timezone ? moment(timestamp).fromNow() :
     moment(timestamp).tz(timezone).fromNow()
