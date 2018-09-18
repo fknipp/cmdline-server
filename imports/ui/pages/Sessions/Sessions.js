@@ -45,7 +45,7 @@ const getUsername = (id) => {
 };
 
 const Sessions = ({
- loading, sessions, match, history 
+  loading, sessions, match, history,
 }) =>
   (!loading ? (
     <StyledSessions>
@@ -65,7 +65,9 @@ const Sessions = ({
             </tr>
           </thead>
           <tbody>
-            {sessions.map(({ _id, owner, hostname, createdAt, updatedAt }) => (
+            {sessions.map(({
+ _id, owner, hostname, createdAt, updatedAt 
+}) => (
               <tr key={_id}>
                 <td>{getUsername(owner)}</td>
                 <td>{hostname}</td>
@@ -81,13 +83,17 @@ const Sessions = ({
                   </Button>
                 </td>
                 <td>
-                  <Button
-                    bsStyle="danger"
-                    onClick={() => handleRemove(_id)}
-                    block
-                  >
-                    Delete
-                  </Button>
+                  {owner === Meteor.userId() ? (
+                    <Button
+                      bsStyle="danger"
+                      onClick={() => handleRemove(_id)}
+                      block
+                    >
+                      Delete
+                    </Button>
+                  ) : (
+                    ''
+                  )}
                 </td>
               </tr>
             ))}
