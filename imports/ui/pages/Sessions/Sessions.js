@@ -17,9 +17,9 @@ const StyledSessions = styled.div`
   }
 `;
 
-const handleRemove = (documentId) => {
+const handleRemove = documentId => {
   if (confirm('Are you sure? This is permanent!')) {
-    Meteor.call('sessions.remove', documentId, (error) => {
+    Meteor.call('sessions.remove', documentId, error => {
       if (error) {
         Bert.alert(error.reason, 'danger');
       } else {
@@ -29,7 +29,7 @@ const handleRemove = (documentId) => {
   }
 };
 
-const getUsername = (id) => {
+const getUsername = id => {
   const user = Meteor.users.findOne(id);
 
   if (user.profile && user.profile.name) {
@@ -44,10 +44,8 @@ const getUsername = (id) => {
   return id;
 };
 
-const Sessions = ({
-  loading, sessions, match, history,
-}) =>
-  (!loading ? (
+const Sessions = ({ loading, sessions, userId, match, history }) =>
+  !loading ? (
     <StyledSessions>
       <div className="page-header clearfix">
         <h4 className="pull-left">Sessions</h4>
@@ -65,9 +63,7 @@ const Sessions = ({
             </tr>
           </thead>
           <tbody>
-            {sessions.map(({
- _id, owner, hostname, createdAt, updatedAt 
-}) => (
+            {sessions.map(({ _id, owner, hostname, createdAt, updatedAt }) => (
               <tr key={_id}>
                 <td>{getUsername(owner)}</td>
                 <td>{hostname}</td>
@@ -76,14 +72,14 @@ const Sessions = ({
                 <td>
                   <Button
                     bsStyle="primary"
-                    onClick={() => history.push(`${match.url}/${_id}`)}
+                    onClick={() => history.push(`sessions/${_id}`)}
                     block
                   >
                     View
                   </Button>
                 </td>
                 <td>
-                  {owner === Meteor.userId() ? (
+                  {owner === userId ? (
                     <Button
                       bsStyle="danger"
                       onClick={() => handleRemove(_id)}
@@ -109,7 +105,7 @@ const Sessions = ({
     </StyledSessions>
   ) : (
     <Loading />
-  ));
+  );
 
 Sessions.propTypes = {
   loading: PropTypes.bool.isRequired,
@@ -119,11 +115,23 @@ Sessions.propTypes = {
 };
 
 export default withTracker(() => {
-  const sessionSubscription = Meteor.subscribe('sessions');
-  const usersSubscription = Meteor.subscribe('users.allUsers');
+  if (Meteor.isClient) {
+    const sessionSubscription = Meteor.subscribe('sessions');
+    const usersSubscription = Meteor.subscribe('users.allUsers');
 
-  return {
-    loading: !sessionSubscription.ready() || !usersSubscription.ready(),
-    sessions: SessionsCollection.find().fetch(),
-  };
+    return {
+      loading: !sessionSubscription.ready() || !usersSubscription.ready(),
+      sessions: SessionsCollection.find().fetch(),
+      userId: Meteor.userId(),
+    };
+  } else {
+    return {
+      loading: false,
+      sessions: SessionsCollection.find(
+        {},
+        { sort: { updatedAt: -1 } }
+      ).fetch(),
+      userId: '',
+    };
+  }
 })(Sessions);
