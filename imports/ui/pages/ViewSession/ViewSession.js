@@ -26,7 +26,7 @@ const renderSession = (session, match, history) =>
 
       <pre><small className="pull-right">
         {time(date)}
-           </small>{user}@{directory} $ <b>{command}</b>
+      </small>{user}:{directory} $ <b>{command}</b>
       </pre>
     </div>
   </Fade>
